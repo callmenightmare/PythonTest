@@ -1,0 +1,74 @@
+
+#use class decorator
+def Singleton(cls):
+    _instance = None
+
+    def _singleton(*args, **kargs):
+        nonlocal _instance
+        if  _instance is None:
+            _instance= cls(*args, **kargs)
+        return _instance
+
+    return _singleton
+
+@Singleton
+class TestSin():
+
+    def __init__(self):
+        print("init called!")
+        print(type(self.__init__))
+        print(self.__init__)
+
+#use class
+class SingletonC(object):
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        if not hasattr(SingletonC, "_instance"):
+            SingletonC._instance = SingletonC(*args, **kwargs)
+        return SingletonC._instance
+
+#use __new__ method
+class SingletonN(object):
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(SingletonN, "_instance"):
+            SingletonN._instance = object.__new__(cls)
+        return SingletonN._instance
+
+#use meta class
+class SingletonMetaClass(type):
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(SingletonMetaClass, "_instance"):
+            SingletonMetaClass._instance = type.__new__(cls, *args, **kwargs)
+        return SingletonMetaClass._instance
+
+class SingletonUseMeta(metaclass=SingletonMetaClass):
+    pass
+
+class ListMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        print("new function called")
+        attrs['add'] = lambda self, value: self.append(value)
+        print(name)
+        print(bases)
+        print(attrs)
+        return type.__new__(cls, name, bases, attrs)
+
+    def __call__(self, *args, **kwargs):
+        print("call function called")
+
+class MyList(list,metaclass=ListMetaclass):
+    def __new__(cls, name, bases, attrs):
+        print("MyList new function called")
+        attrs['add'] = lambda self, value: self.append(value)
+        print(name)
+        print(bases)
+        print(attrs)
+        return type.__new__(cls, name, bases, attrs)
+    def __init__(self):
+        print("init function called")
+L = MyList()
+
